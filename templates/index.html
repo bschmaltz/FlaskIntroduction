@@ -1,40 +1,47 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>Task Master</title>
+<title>Token Validator</title>
 {% endblock %}
 
 {% block body %}
-<div class="content">
-    <h1 style="text-align: center">Task Master</h1>
-    {% if tasks|length < 1 %}
-    <h4 style="text-align: center">There are no tasks. Create one below!</h4>
-    {% else %}
-    <table>
-        <tr>
-            <th>Task</th>
-            <th>Added</th>
-            <th>Actions</th>
-        </tr>
-        {% for task in tasks %}
-            <tr>
-                <td>{{ task.content }}</td>
-                <td>{{ task.date_created.date() }}</td>
-                <td>
-                    <a href="/delete/{{task.id}}">Delete</a>
-                    <br>
-                    <a href="/update/{{task.id}}">Update</a>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
-    {% endif %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <div class="form">
-        <form action="/" method="POST">
-            <input type="text" name="content" id="content">
-            <input type="submit" value="Add Task">
-        </form>
+<div class="content">
+    <h1 style="text-align: center">Token Validator</h1>
+
+    <div id="input">
+        <input id="token" type="text" name="token">
+        <button id="submit-button" type="button">Submit</button>
     </div>
+
+    <div id="result"></div>
 </div>
+
+<script>
+    const submitButton = $("#submit-button");
+    const tokenInput = $("#token");
+    const result = $("#result");
+    submitButton.click(function(event) {
+        event.preventDefault();
+        submitButton.disabled = true;
+        $.post(
+            "/validate",
+            {
+                token: tokenInput.val()
+            },
+            function(data, status) {
+                submitButton.disabled = false;
+                if (data.success === true) {
+                    result.html("Success! :)");
+                }
+                else
+                {
+                    result.html("Failed! :(");
+                }
+            }
+        );
+    });
+</script>
+
 {% endblock %}
